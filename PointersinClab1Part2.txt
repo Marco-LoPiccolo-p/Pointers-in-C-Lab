@@ -1,0 +1,173 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+/*Function Declarations */
+void readInput(float *floatArray, int arraySize);
+void printArray(float *floatArray, int arraySize);
+void userChoice(float *floatArray, int arraySize);
+float findMin(float *floatArray, int arraySize);
+float findMax(float *floatArray, int arraySize);
+float findSum(float *floatArray, int arraySize);
+float findAvg(float *floatArray, int arraySize);
+void getDataSetSize(int *dataSetSizePtr);
+void allocateFloatArray(float **dataSetPtrPtr, int dataSetSize);
+void freeFloatMemory(float **dataSetPtrPtr);
+
+int main (){
+	float *dataSetPtr = NULL;   /*Dynamic Allocated Array space so no value saved in this pointer but points to float values of an address specified later */
+	int dataSetSize = 0;        /*Set Data set size 0 so that we can make sure that if a problem occurs we can see if the function that changes the size actually works */
+	
+	getDataSetSize(&dataSetSize);
+	/* DEBUG Statement */
+	/*printf("dataSetSize is: %i\n", dataSetSize);*/
+
+	allocateFloatArray(&dataSetPtr, dataSetSize);
+	
+	/*Debug Statement*/
+	/*printf("dataSetPtr is: %p", dataSetPtr);*/
+	
+	readInput(dataSetPtr, dataSetSize);
+	userChoice(dataSetPtr, dataSetSize);
+	freeFloatMemory(&dataSetPtr);
+	/*Debug Statement */
+	/*printf("dataSetPtr is: %p", dataSetPtr);*/
+}
+
+/*Function has is a pointer to an integer as the function parameter is being passed by reference so the value in main can be changed and the function itself asks the user to enter the size of the dataset and then this is saved in the pointer which points to the integer that saves the data set size. The function is void so that is doesn't return any value after it is performed.*/
+void getDataSetSize(int *dataSetSizePtr){
+	printf("Please enter the size of the data set.\n");
+
+	scanf("%i", dataSetSizePtr);
+}
+
+/*Function has two paramters one is a pointer to a float pointer that points to an address which is the space that is allocated by the OS and the second is the data set size which we found in the previous function. The function uses pass by reference for the first parameter so that when changes made in this function are saved directly in the value in main. The function itself uses the size of the data set to then allocate the space required for the size of the float values since that is the value being stored in the array and then it checks just to make sure that the pointer actually points to a pointer that points to a an allocated space address. The function is void so that is doesn't return any value after it is performed.*/
+void allocateFloatArray(float **dataSetPtrPtr, int dataSetSize){
+	*dataSetPtrPtr = calloc(dataSetSize, sizeof(float));
+	
+	if(*dataSetPtrPtr == NULL){
+		printf("Memory not available for all data. Terminating program\n");
+		exit(0);
+	}
+}
+
+/*This function also uses pass by reference which is why it is a pointer to another float pointer that will then save that value to the value found in main and this function uses the free command to free the allocated space that was used for the dynamic array as it needs to be given back to the OS. The function checks if the address is null and if it isn't it frees the space and then sets the address to null for the value that goes back to array. The function is void so that is doesn't return any value after it is performed.*/
+void freeFloatMemory(float **dataSetPtrPtr){
+	if (*dataSetPtrPtr != NULL) {
+		free(*dataSetPtrPtr);  /*Releases Storage to which p points back to the OS */
+	}
+	
+	*dataSetPtrPtr = NULL;
+}
+
+/*The function is void so that is doesn't return any value after it is performed. Function has two values which are both pass by value and the first is a float pointer to the array and the second is an int which represents the size of the array. The function asks the user to enter values for the data set which uses a for loop and goes through the entire array and stores the values as floats within the array. Declares an integer i so that it can be used in the for loop*/
+void readInput(float *floatArray, int arraySize){
+	int i;
+	printf("Enter the values in the data set, each on a separate line\n");
+	for (i = 0; i < arraySize; ++i){
+    		scanf("%f", &floatArray[i]);
+  	}
+
+}
+
+/*The function is void so that is doesn't return any value after it is performed. Function has two values which are both pass by value and the first is a float pointer to the array and the second is an int which represents the size of the array. Fucntion prints the array that was entered by the user using the label of data set and goes through the entire array by using a for loop and goes up until right before the array size and rounds the numbers to 2 decimal points.*/
+void printArray(float *floatArray, int arraySize){
+	int i;
+	printf("\nData set: \n");
+	for (i = 0; i < arraySize; ++i){
+    		printf("%.2f\n", floatArray[i]);
+  	}
+}
+
+/*The function is void so that is doesn't return any value after it is performed. Function has two values which are both pass by value and the first is a float pointer to the array and the second is an int which represents the size of the array. Function prompts the user to choose from 6 options which all call their respective functions and uses the switch command to choose which function to be performed. The function in each switch statement calls this same function so that it keeps being repeated until the user wishes to exit the function by choosing option 6. If 1 through 6 is not chosen then it outputs an error message to the user to enter a valid value and then calls this function again. Each option also prints the respective string to label what the value of the min, max, sum, or average values that are returned by their respective functions. All values are rounded to 2 digits after the decimal point.*/
+void userChoice(float *floatArray, int arraySize){
+	int chooseValue;
+	float minVal;
+	float maxVal;
+	float sumVal;
+	float avgVal;
+
+	printf("\nEnter one of the six numbers: \n 1. Find the Minimum Value. \n 2. Find the Maximum Value \n 3. Calculate the sum of all the values. \n 4. Calculate the average of all the values. \n 5. Print the values in the data set. \n 6. Exit the program. \n");		
+	scanf("%i", &chooseValue);
+	switch(chooseValue) {
+	case 1:
+		minVal = findMin(floatArray, arraySize);
+		printf("Minimum Value of List: %.2f\n", minVal);
+		userChoice(floatArray, arraySize);
+		break;
+	case 2:
+		maxVal = findMax(floatArray, arraySize);
+		printf("Maximum Value of List: %.2f\n", maxVal);
+		userChoice(floatArray, arraySize);
+		break;
+	case 3:
+		sumVal = findSum(floatArray, arraySize);
+		printf("Sum of all Values in List: %.2f\n", sumVal);
+		userChoice(floatArray, arraySize);
+		break;
+	case 4:
+		avgVal = findAvg(floatArray, arraySize);
+		printf("Average of all Values in List: %.2f\n", avgVal);
+		userChoice(floatArray, arraySize);
+		break;
+	case 5:
+		printArray(floatArray, arraySize);
+		userChoice(floatArray, arraySize);
+		break;
+	case 6:
+		/*This option will just return us back to main since we need to free the allocated space used for the dynamic array*/
+		break;
+	default:
+		printf("Invalid Number entered, please enter another value");
+		userChoice(floatArray, arraySize);
+	}
+
+}
+
+/*The function is float so that it can return the float of the minimum value. Function has two values which are both pass by value and the first is a float pointer to the array and the second is an int which represents the size of the array. Function finds the minimum value of the array by first setting the first value to be min and then checks to see if each one after is smaller and if it is then that becomes the min but if not the current min stays as the min value.*/
+float findMin(float *floatArray, int arraySize){
+	int i;
+	float minVal;
+	minVal = floatArray[0];
+	for (i = 1; i < arraySize; ++i){
+		if (floatArray[i] < floatArray[i-1]){
+			minVal = floatArray[i];
+		}
+		else {
+			minVal = minVal;
+		}
+	}
+	return minVal;
+}
+
+/*The function is float so that it can return the float of the maximum value. Function has two values which are both pass by value and the first is a float pointer to the array and the second is an int which represents the size of the array. Function finds the maximum value of the array by first setting the first value to be max and then checks to see if each one after is larger and if it is then that becomes the max but if not the current max stays as the max value.*/
+float findMax(float *floatArray, int arraySize){
+	int i;
+	float maxVal;
+	maxVal = floatArray[0];
+	for (i = 1; i < arraySize; i++){
+		if (floatArray[i] > maxVal){
+			maxVal = floatArray[i];
+		}
+	}
+	return maxVal;
+}
+
+/*The function is float so that it can return the float of the sum value. Function has two values which are both pass by value and the first is a float pointer to the array and the second is an int which represents the size of the array. The function finds the sum of the array by adding each value in the array with a declared value of sum starting at 0 and uses the for loop to iterate through the entire array and add each value to the sumval float value.*/
+float findSum(float *floatArray, int arraySize){
+	int i;
+	float sumVal;
+	sumVal = 0;
+	for (i = 0; i < arraySize; ++i){
+		sumVal = sumVal + floatArray[i];
+	}
+	return sumVal;
+}
+
+/*The function is float so that it can return the float of the average. Function has two values which are both pass by value and the first is a float pointer to the array and the second is an int which represents the size of the array. The function first declares two integers, one being the sumval which will be called within the function and then it is saved in this function. The second is average value which is found by using the array size and dividing it by the sum value found by calling the previous function and then it returns that average value.*/
+float findAvg(float *floatArray, int arraySize){
+	float sumValForAvg;
+	float avgValue;
+	sumValForAvg = findSum(floatArray, arraySize);
+	avgValue = sumValForAvg / arraySize;
+	return avgValue;
+}
